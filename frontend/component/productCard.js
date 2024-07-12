@@ -1,6 +1,6 @@
 //#region imports
 import * as React from 'react';
-import { TextField,Card, CardContent, Typography, CardActions, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, Snackbar, Box } from '@mui/material';
+import { TextField, Card, CardContent, Typography, CardActions, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, Snackbar, Box } from '@mui/material';
 //#endregion
 
 export default function ProductCard({ product }) {
@@ -26,7 +26,6 @@ export default function ProductCard({ product }) {
     };
 
     const handleConfirmDelete = async () => {
-        toggleDialog();
 
         try {
             const response = await fetch(`http://localhost:3001/products/delete/${product._id}`, {
@@ -36,7 +35,7 @@ export default function ProductCard({ product }) {
             if (!response.ok) {
                 throw new Error('Failed to delete product');
             }
-
+            toggleDeleteDialog();
             setAlertOpen(true);
             setTimeout(() => {
                 setAlertOpen(false);
