@@ -47,7 +47,7 @@ export default function Home() {
 
         fetchProducts();
     }, []);
-
+    
     const handleOpenModal = () => {
         setOpenModal(true);
     };

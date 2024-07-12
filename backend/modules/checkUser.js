@@ -1,3 +1,4 @@
+const { checkBody,checkWhiteSpaces } = require('./tools/bodyExamination');
 const User = require('../models/users');
 
 async function checkUser(username) {
@@ -10,4 +11,23 @@ async function checkUser(username) {
     }
 }
 
-module.exports = { checkUser };
+async function validateSignup(reqBody) {
+    const { username, password } = reqBody;
+    const requiredFields = ['username', 'password'];
+
+    if (!checkBody(reqBody, requiredFields)) {
+        return { isValid: false, message: 'Missing or empty fields' };
+    }
+
+    if (checkWhiteSpaces(username)) {
+        return { isValid: false, message: 'Username contains spaces' };
+    }
+
+    const userExists = await checkUser(username);
+    if (userExists) {
+        return { isValid: false, message: 'User already exists' };
+    }
+
+    return { isValid: true, username };
+}
+module.exports = { validateSignup };

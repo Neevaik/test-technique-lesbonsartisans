@@ -8,36 +8,32 @@ const User = require('../models/users');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-const { checkUser } = require('../modules/checkUser')
-const { checkBody } = require('../modules/checkBody')
+const { validateSignup } = require('../modules/checkUser')
+const { checkBody } = require('../modules/tools/bodyExamination')
 //#endregion
 
 //#region POST METHOD
 router.post('/signup', async (req, res) => {
-  const { username, password } = req.body;
-  const requiredFields = ['username', 'password'];
 
-  if (!checkBody(req.body, requiredFields)) {
-    return res.status(400).json({ result: false, message: 'Missing field' });
+  const validUser = await validateSignup(req.body);
+  if (!validUser.isValid) {
+    return res.status(400).json({ result: false, message: validUser.message });
   }
-
+  
+  const { username } = validUser;
   try {
-    const userExists = await checkUser(username);
-
-    if (userExists) {
-      return res.status(400).json({ result: false, message: 'User already exists' });
-    }
 
     const newUser = new User({
       username,
-      password: bcrypt.hashSync(password, 10),
+      password: bcrypt.hashSync(req.body.password, 10),
       token: uid2(32)
     });
 
     const data = await newUser.save();
-    res.json({ result: true, message: 'User added!',user:data });
+    return res.json({ result: true, message: 'User added!', user: data });
+
   } catch (error) {
-    res.status(500).json({ result: false, message: 'Internal server error', error: error.message });
+    return res.status(500).json({ result: false, message: 'Internal server error', error: error.message });
   }
 });
 
@@ -45,9 +41,8 @@ router.post('/signup', async (req, res) => {
 router.post('/signin', async (req, res) => {
 
   const { username, password } = req.body;
-  const requiredFields = ['username', 'password'];
 
-  if (!checkBody(req.body, requiredFields)) {
+  if (!checkBody(req.body, ['username', 'password'])) {
     return res.status(400).json({ result: false, message: 'Missing field' });
   }
 
@@ -67,9 +62,9 @@ router.post('/signin', async (req, res) => {
 //#endregion
 
 //#region GET METHOD
-router.get('/all',(req,res) => {
+router.get('/all', (req, res) => {
   User.find()
-  .then(data => res.json({allUsers:data}))
+    .then(data => res.json({ allUsers: data }))
 })
 
 //#endregion

@@ -13,12 +13,12 @@ const store = configureStore({
 export default function App({ Component, pageProps }) {
   
   const router = useRouter();
-  const shownNavbar = router.pathname !== '/';
+  const isLoginPage = router.pathname === '/';
 
   return (
     <>
       <Provider store={store}>
-        {shownNavbar && <Navbar />}
+        {!isLoginPage && (<Navbar />)}
         <Component {...pageProps} />
       </Provider>
     </>
