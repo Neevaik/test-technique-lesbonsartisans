@@ -35,7 +35,7 @@ router.post('/signup', async (req, res) => {
     });
 
     const data = await newUser.save();
-    res.json({ result: true, message: 'User added!', token: data.token });
+    res.json({ result: true, message: 'User added!',user:data });
   } catch (error) {
     res.status(500).json({ result: false, message: 'Internal server error', error: error.message });
   }
