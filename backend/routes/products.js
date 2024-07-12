@@ -4,8 +4,6 @@ var router = express.Router();
 const Product = require('../models/products');
 //#endregion
 
-
-
 //#region POST METHOD
 router.post('/add', (req, res) => {
     const newProduct = new Product({

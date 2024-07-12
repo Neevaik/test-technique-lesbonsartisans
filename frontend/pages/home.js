@@ -5,7 +5,8 @@ import { Container, Grid } from '@mui/material';
 export default function Home() {
     
     const [products, setProducts] = useState([]);
-    console.log({products})
+    
+    
     useEffect(() => {
         const fetchProducts = async () => {
             try {
