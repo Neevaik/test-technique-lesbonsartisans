@@ -32,7 +32,6 @@ export default function LoginPage() {
   const [openSignUp, setOpenSignUp] = React.useState(false);
 
   const handleSubmit = async (event) => {
-
     event.preventDefault();
     const username = event.target.username.value;
     const password = event.target.password.value;
@@ -53,7 +52,7 @@ export default function LoginPage() {
           token: data.user.token,
         }));
 
-        router.push('/productsPage');
+        router.push('/home');
 
       } else {
         throw new Error('Login failed');
@@ -71,8 +70,6 @@ export default function LoginPage() {
   const handleCloseSignUp = () => {
     setOpenSignUp(false);
   };
-
-
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -160,7 +157,7 @@ export default function LoginPage() {
           </Box>
         </Grid>
       </Grid>
-      <SignUpModal open={openSignUp} handleClose={handleCloseSignUp}/>
+      <SignUpModal open={openSignUp} handleClose={handleCloseSignUp} />
     </ThemeProvider>
   );
 }

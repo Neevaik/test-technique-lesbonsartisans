@@ -7,20 +7,17 @@ import { createTheme } from '@mui/material/styles';
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router';
 import { login } from '@/reducers/users';
-
 //#endregion
 
 const defaultTheme = createTheme();
 
-export default function SignUpModal({ open, handleClose }) {
+const SignUpModal = React.forwardRef(({ open, handleClose }, ref) => {
 
     const dispatch = useDispatch();
     const router = useRouter();
     const [error, setError] = React.useState(null);
 
-
     const handleSubmit = async (event) => {
-
         event.preventDefault();
         const username = event.target.username.value;
         const password = event.target.password.value;
@@ -40,7 +37,7 @@ export default function SignUpModal({ open, handleClose }) {
                     username: data.user.username,
                     token: data.user.token
                 }));
-                router.push('/productsPage');
+                router.push('/home');
             }
             else {
                 throw new Error('Signup failed');
@@ -51,13 +48,13 @@ export default function SignUpModal({ open, handleClose }) {
         }
     };
 
-
     return (
         <Modal
             open={open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
+            ref={ref}
             sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -143,4 +140,6 @@ export default function SignUpModal({ open, handleClose }) {
             </ThemeProvider>
         </Modal>
     );
-}
+});
+
+export default SignUpModal;

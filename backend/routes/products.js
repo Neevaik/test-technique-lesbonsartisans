@@ -21,6 +21,10 @@ router.post('/add', (req, res) => {
         .then(newProduct => {
             res.json({ result: true, newProduct })
         })
+        .catch(err => {
+            console.error('Error saving product:', err);
+            res.status(500).json({ result: false, error: 'Failed to save product' });
+        });
 });
 //#endregion
 
@@ -69,7 +73,6 @@ router.put('/update/:id', (req, res) => {
 });
 
 //#endregion
-
 
 //#region DELETE METHOD
 router.delete('/delete/:id',(req,res) => {
