@@ -5,11 +5,11 @@ var router = express.Router();
 require('../models/connection');
 
 const User = require('../models/users');
-const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
-const { validateSignup } = require('../modules/checkUser')
-const { checkBody } = require('../modules/tools/bodyExamination')
+const { validateSignup } = require('../modules/checkUser');
+const { checkBody } = require('../modules/tools/bodyExamination');
+const { generateToken } = require('../modules/tools/generateToken');
 //#endregion
 
 //#region POST METHOD
@@ -26,11 +26,16 @@ router.post('/signup', async (req, res) => {
     const newUser = new User({
       username,
       password: bcrypt.hashSync(req.body.password, 10),
-      token: uid2(32)
     });
 
     const data = await newUser.save();
-    return res.json({ result: true, message: 'User added!', user: data });
+
+    const token = generateToken({
+      username:data.username,
+      createdAt:new Date()
+    })
+
+    return res.json({ result: true, message: 'User added!', user: data,token });
 
   } catch (error) {
     return res.status(500).json({ result: false, message: 'Internal server error', error: error.message });
@@ -45,12 +50,16 @@ router.post('/signin', async (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     return res.status(400).json({ result: false, message: 'Missing field' });
   }
-
   try {
     const user = await User.findOne({ username });
 
     if (user && bcrypt.compareSync(password, user.password)) {
-      return res.json({ result: true, user });
+      const token = generateToken({
+        username:user.username,
+        createdAt:new Date(),
+      })
+
+      return res.json({ result: true, user,token });
     }
     return res.status(401).json({ result: false, message: 'Invalid username or password' });
 
