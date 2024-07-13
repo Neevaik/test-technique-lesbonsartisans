@@ -12,9 +12,11 @@ import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import AddProductModal from '../component/modals/addProduct';
 import ProductCard from '../component/productCard';
-
+import { jwtDecode } from 'jwt-decode';
+import io from 'socket.io-client';
 //#endregion
 
+const socket = io('http://localhost:3002');
 
 export default function Home() {
     const [products, setProducts] = React.useState([]);
@@ -24,12 +26,30 @@ export default function Home() {
 
     React.useEffect(() => {
         fetchProducts();
-        if(!user.token){
+        checkTokenExpiration();
+        setupSocketListeners();
+    }, []);
+
+    const checkTokenExpiration = () => {
+        if (!user.token) {
+            router.push('/');
+            return;
+        }
+
+        try {
+            const decoded = jwtDecode(user.token);
+            const expirationTime = decoded.exp * 1000;
+            const currentTime = Date.now();
+
+            if (currentTime > expirationTime) {
+                router.push('/');
+            }
+        } catch (error) {
+            console.error('Error decoding token:', error);
             router.push('/');
         }
-    }, [user.token,router]);
+    };
 
-    console.log(user.token)
     const fetchProducts = async () => {
         try {
             const response = await fetch('http://localhost:3001/products/all');
@@ -42,10 +62,32 @@ export default function Home() {
             console.error('Error fetching products:', error);
         }
     };
+
     const handleModalToggle = () => {
         setOpenModal(!openModal);
     };
 
+    const setupSocketListeners = () => {
+        socket.on('productAdded', (newProduct) => {
+            setProducts(prevProducts => [...prevProducts, newProduct]);
+        });
+
+        socket.on('productUpdated', (updatedProduct) => {
+            setProducts(prevProducts =>
+                prevProducts.map(product =>
+                    product._id === updatedProduct._id ? updatedProduct : product
+                )
+            );
+        });
+
+        socket.on('productDeleted', (deletedProduct) => {
+            setProducts(prevProducts =>
+                prevProducts.filter(product =>
+                    product._id !== deletedProduct._id
+                )
+            );
+        });
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

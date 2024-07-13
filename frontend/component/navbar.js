@@ -5,12 +5,19 @@ import HomeIcon from '@mui/icons-material/Home';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/reducers/users';
+import { useRouter } from 'next/router';
 //#endregion
 
 export default function Navbar() {
   
   const dispatch = useDispatch();
   const drawerWidth = 240;
+  const router = useRouter();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push('/');
+  };
 
   return (
     <Drawer
@@ -44,7 +51,7 @@ export default function Navbar() {
       </List>
       <Divider />
       <List sx={{ marginTop: 'auto' }}>
-        <ListItem button onClick={() => dispatch(logout())}>
+        <ListItem button onClick={handleLogout}>
           <ListItemIcon>
             <ExitToAppIcon />
           </ListItemIcon>

@@ -3,21 +3,35 @@ var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
 const http = require('http');
-const socketIo = require('socket.io');
+const {Server} = require('socket.io');
 const Product = require('../models/products');
 const { verifyToken } = require('../modules/tools/verifyToken')
+const cors = require('cors');
+
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server,{
+    cors:{
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true
+    }
+});
+
 mongoose.connect(process.env.CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true });
 
-app.use(express.json());
+
+app.use(cors())
 
 io.on('connection', (socket) => {
     console.log('New client connected');
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
+    });
+    socket.on('example', (data) => {
+        console.log('Received data:', data);
     });
 });
 //#endregion
@@ -117,11 +131,13 @@ router.delete('/delete/:id', verifyToken, (req, res) => {
 //#endregion
 
 //#region socket
-const PORT = 3002;
-server.listen(PORT, () => {
+
+const PORT =  process.env.PORT;
+server.listen(3002, () => {
     console.log('Server on port 3002');
 });
 //#endregion
+
 
 
 module.exports = router;
