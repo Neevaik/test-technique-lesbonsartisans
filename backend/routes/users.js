@@ -10,6 +10,9 @@ const bcrypt = require('bcrypt');
 const { validateSignup } = require('../modules/checkUser');
 const { checkBody } = require('../modules/tools/inspectBody');
 const { generateToken } = require('../modules/tools/generateToken');
+
+const jwt = require('jsonwebtoken');
+
 //#endregion
 
 //#region POST METHOD
@@ -58,6 +61,10 @@ router.post('/signin', async (req, res) => {
         username: user.username,
         createdAt: new Date(),
       })
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+      console.log(decoded)
       return res.json({ result: true, user, token });
     }
     return res.status(401).json({ result: false, message: 'Invalid username or password' });

@@ -1,9 +1,28 @@
 //#region imports
 var express = require('express');
 var router = express.Router();
+const mongoose = require('mongoose');
+const http = require('http');
+const socketIo = require('socket.io');
 const Product = require('../models/products');
 const { verifyToken } = require('../modules/tools/verifyToken')
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+mongoose.connect(process.env.CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true });
+
+app.use(express.json());
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
 //#endregion
+
+
 
 //#region POST METHOD
 router.post('/add', verifyToken, (req, res) => {
@@ -19,7 +38,9 @@ router.post('/add', verifyToken, (req, res) => {
 
     newProduct.save()
         .then(newProduct => {
-            res.json({ result: true, newProduct })
+            res.json({ result: true, newProduct });
+            io.emit('productedAdded', newProduct);
+
         })
         .catch(err => {
             console.error('Error saving product:', err);
@@ -46,7 +67,7 @@ router.get('/getOne/:id', (req, res) => {
 //#endregion
 
 //#region PUT METHOD
-router.put('/update/:id',verifyToken, (req, res) => {
+router.put('/update/:id', verifyToken, (req, res) => {
     const productId = req.params.id;
 
     const updatedProduct = {
@@ -63,6 +84,7 @@ router.put('/update/:id',verifyToken, (req, res) => {
             if (result) {
                 console.log("Updated Product:", result);
                 res.json({ result: true, message: "Product updated successfully", updatedProduct: result });
+                io.emit('productUpdated', result);
             } else {
                 res.json({ result: false, message: "No product found or no changes made" });
             }
@@ -75,17 +97,30 @@ router.put('/update/:id',verifyToken, (req, res) => {
 //#endregion
 
 //#region DELETE METHOD
-router.delete('/delete/:id',verifyToken, (req, res) => {
+router.delete('/delete/:id', verifyToken, (req, res) => {
     const productId = req.params.id;
 
-    Product.deleteOne({ _id: productId })
-        .then(() => {
-            return Product.find()
+    Product.findByIdAndDelete(productId)
+        .then(deletedProduct => {
+            if (!deletedProduct) {
+                throw new Error('Product not found');
+            }
+            console.log("Deleted Product:", deletedProduct);
+            res.json({ result: true, message: 'Product deleted!' });
+            io.emit('productDeleted', deletedProduct);
         })
-        .then(() => {
-            res.json({ result: true, message: 'Product deleted!' })
-        })
-})
+        .catch(err => {
+            console.error('Error deleting product:', err);
+            res.status(500).json({ result: false, error: 'Failed to delete product' });
+        });
+});
+//#endregion
+
+//#region socket
+const PORT = 3002;
+server.listen(PORT, () => {
+    console.log('Server on port 3002');
+});
 //#endregion
 
 

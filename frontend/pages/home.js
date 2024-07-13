@@ -8,6 +8,7 @@ import {
     Button,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import AddProductModal from '../component/modals/addProduct';
 import ProductCard from '../component/productCard';
@@ -19,13 +20,16 @@ export default function Home() {
     const [products, setProducts] = React.useState([]);
     const [openModal, setOpenModal] = React.useState(false);
     const user = useSelector((state) => state.users.value);
+    const router = useRouter();
 
     React.useEffect(() => {
-
         fetchProducts();
-    }, []);
+        if(!user.token){
+            router.push('/');
+        }
+    }, [user.token,router]);
 
-    console.log(user)
+    console.log(user.token)
     const fetchProducts = async () => {
         try {
             const response = await fetch('http://localhost:3001/products/all');
@@ -38,7 +42,6 @@ export default function Home() {
             console.error('Error fetching products:', error);
         }
     };
-
     const handleModalToggle = () => {
         setOpenModal(!openModal);
     };
