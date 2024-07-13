@@ -53,8 +53,7 @@ router.post('/add', verifyToken, (req, res) => {
     newProduct.save()
         .then(newProduct => {
             res.json({ result: true, newProduct });
-            io.emit('productedAdded', newProduct);
-
+            io.emit('productAdded', newProduct);
         })
         .catch(err => {
             console.error('Error saving product:', err);

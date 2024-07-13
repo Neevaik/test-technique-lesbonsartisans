@@ -69,7 +69,13 @@ export default function Home() {
 
     const setupSocketListeners = () => {
         socket.on('productAdded', (newProduct) => {
-            setProducts(prevProducts => [...prevProducts, newProduct]);
+            console.log('Product added:', newProduct);
+        
+            const productExists = products.some(product => product._id === newProduct._id);
+        
+            if (!productExists) {
+                setProducts(prevProducts => [...prevProducts, newProduct]);
+            }
         });
 
         socket.on('productUpdated', (updatedProduct) => {

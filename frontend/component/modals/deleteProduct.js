@@ -7,7 +7,7 @@ import {
     Button,
 } from '@mui/material';
 
-export default function DeleteProductModal({ open, onClose, product, token,operationSuccess }) {
+export default function DeleteProductModal({ open, onClose, product, token, onSuccess }) {
 
     const handleConfirmDelete = async () => {
 
@@ -24,13 +24,13 @@ export default function DeleteProductModal({ open, onClose, product, token,opera
             const data = await response.json();
             console.log('Product deleted successfully:', data);
             onClose();
-            {operationSuccess}
+            onSuccess();
         } catch (error) {
             console.error('Error deleting product:', error);
             alert('Failed to delete product');
         }
     };
-    
+
     return (
         <Dialog
             open={open}

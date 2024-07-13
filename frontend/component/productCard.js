@@ -72,7 +72,7 @@ export default function ProductCard({ product, user }) {
                 onClose={toggleUpdateDialog}
                 product={product}
                 token={user.token}
-                onUpdateSuccess={handleOperationSuccess}
+                onSuccess={handleOperationSuccess}
             />
 
             <DeleteProductModal
@@ -80,7 +80,7 @@ export default function ProductCard({ product, user }) {
                 onClose={toggleDeleteDialog}
                 product={product}
                 token={user.token}
-                operationSuccess={handleOperationSuccess}
+                onSuccess={handleOperationSuccess}
             />
 
             <Snackbar
@@ -88,7 +88,7 @@ export default function ProductCard({ product, user }) {
                 autoHideDuration={3000}
                 onClose={() => setAlertOpen(false)}
             >
-                <Alert onClose={() => setAlertOpen(false)} severity="success" sx={{ width: '80%' }}>
+                <Alert onClose={() => setAlertOpen(false)} severity="success" sx={{ width: '100%' }}>
                     Operation successful
                 </Alert>
             </Snackbar>

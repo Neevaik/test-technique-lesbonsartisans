@@ -9,24 +9,30 @@ import {
   CardContent,
   CardActions,
   Button,
+  Switch
 } from '@mui/material';
 //#endregion
 
 
-export default function AddProductModal({ open, onClose,user}) {
+export default function AddProductModal({ open, onClose, user }) {
   const [newProduct, setNewProduct] = React.useState({
     name: '',
     type: '',
     price: '',
     rating: '',
     warranty_years: '',
-    available: '',
+    available: false,
   });
 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
+
+    if (name === 'available') {
+      setNewProduct({ ...newProduct, [name]: e.target.checked });
+    } else {
+      setNewProduct({ ...newProduct, [name]: value });
+    }
   };
 
   const handleAddProduct = async () => {
@@ -56,7 +62,11 @@ export default function AddProductModal({ open, onClose,user}) {
       onClose={onClose}
       aria-labelledby="add-new-product-modal-title"
       aria-describedby="add-new-product-modal-description"
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
       <Box
         sx={{
@@ -71,7 +81,12 @@ export default function AddProductModal({ open, onClose,user}) {
           maxWidth: '80%',
         }}
       >
-        <Typography id="add-new-product-modal-title" variant="h6" component="h2" gutterBottom>
+        <Typography
+          id="add-new-product-modal-title"
+          variant="h6"
+          component="h2"
+          gutterBottom
+        >
           Add New Product
         </Typography>
         <Card>
@@ -119,14 +134,16 @@ export default function AddProductModal({ open, onClose,user}) {
               value={newProduct.warranty_years}
               onChange={handleChange}
             />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Available"
-              name="available"
-              value={newProduct.available}
-              onChange={handleChange}
-            />
+            {/* Switch component for Available */}
+            <Typography component="div" variant="body1" gutterBottom>
+              Available
+              <Switch
+                checked={newProduct.available}
+                onChange={handleChange}
+                name="available"
+                inputProps={{ 'aria-label': 'toggle available' }}
+              />
+            </Typography>
           </CardContent>
           <CardActions>
             <Button onClick={onClose}>Cancel</Button>

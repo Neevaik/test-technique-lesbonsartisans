@@ -8,7 +8,7 @@ import {
     Button,
 } from '@mui/material';
 
-export default function UpdateProductModal({ open, onClose, product, token, operationSuccess }) {
+export default function UpdateProductModal({ open, onClose, product, token, onSuccess }) {
 
     const [updatedProduct, setUpdatedProduct] = React.useState({ ...product });
 
@@ -37,7 +37,7 @@ export default function UpdateProductModal({ open, onClose, product, token, oper
             const data = await response.json();
             console.log('Product updated successfully:', data);
             onClose();
-            {operationSuccess}
+            onSuccess()
         } catch (error) {
             console.error('Error updating product:', error);
             alert('Failed to update product');
