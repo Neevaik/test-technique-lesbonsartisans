@@ -1,42 +1,62 @@
-import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Button } from '@mui/material';
+//#region imports
+import * as React from 'react';
+import {
+  Modal,
+  Box,
+  TextField,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+} from '@mui/material';
+//#endregion
 
-const AddProductModal = ({ open, onClose, onSubmit }) => {
-  const [productName, setProductName] = useState('');
-  const [productType, setProductType] = useState('');
-  const [productPrice, setProductPrice] = useState('');
-  const [productRating, setProductRating] = useState('');
-  const [productWarranty, setProductWarranty] = useState('');
-  const [productAvailable, setProductAvailable] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Create product object
-    const newProduct = {
-      name: productName,
-      type: productType,
-      price: productPrice,
-      rating: productRating,
-      warranty_years: productWarranty,
-      available: productAvailable,
-    };
-    // Call onSubmit function passed from parent component
-    onSubmit(newProduct);
-    // Reset form fields
-    setProductName('');
-    setProductType('');
-    setProductPrice('');
-    setProductRating('');
-    setProductWarranty('');
-    setProductAvailable('');
+export default function AddProductModal({ open, onClose,user}) {
+  const [newProduct, setNewProduct] = React.useState({
+    name: '',
+    type: '',
+    price: '',
+    rating: '',
+    warranty_years: '',
+    available: '',
+  });
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct({ ...newProduct, [name]: value });
+  };
+
+  const handleAddProduct = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/products/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(newProduct),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add product');
+      }
+      const data = await response.json();
+      console.log('Product added:', data);
+      onClose();
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
   };
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      aria-labelledby="add-product-modal"
-      aria-describedby="modal-for-adding-new-product"
+      aria-labelledby="add-new-product-modal-title"
+      aria-describedby="add-new-product-modal-description"
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     >
       <Box
         sx={{
@@ -44,76 +64,78 @@ const AddProductModal = ({ open, onClose, onSubmit }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 400,
           bgcolor: 'background.paper',
           boxShadow: 24,
           p: 4,
+          minWidth: '300px',
+          maxWidth: '80%',
         }}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography id="add-new-product-modal-title" variant="h6" component="h2" gutterBottom>
           Add New Product
         </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            required
-            fullWidth
-            label="Product Name"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Product Type"
-            value={productType}
-            onChange={(e) => setProductType(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Product Price"
-            value={productPrice}
-            onChange={(e) => setProductPrice(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Product Rating"
-            value={productRating}
-            onChange={(e) => setProductRating(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Product Warranty Years"
-            value={productWarranty}
-            onChange={(e) => setProductWarranty(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            select
-            label="Product Availability"
-            value={productAvailable}
-            onChange={(e) => setProductAvailable(e.target.value)}
-            SelectProps={{ native: true }}
-            margin="normal"
-          >
-            <option value={true}>Yes</option>
-            <option value={false}>No</option>
-          </TextField>
-          <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-            Add Product
-          </Button>
-        </form>
+        <Card>
+          <CardContent>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Name"
+              name="name"
+              value={newProduct.name}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Type"
+              name="type"
+              value={newProduct.type}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Price"
+              name="price"
+              type="number"
+              value={newProduct.price}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Rating"
+              name="rating"
+              type="number"
+              value={newProduct.rating}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Warranty"
+              name="warranty_years"
+              type="number"
+              value={newProduct.warranty_years}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Available"
+              name="available"
+              value={newProduct.available}
+              onChange={handleChange}
+            />
+          </CardContent>
+          <CardActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={handleAddProduct} color="primary">
+              Confirm
+            </Button>
+          </CardActions>
+        </Card>
       </Box>
     </Modal>
   );
-};
-
-export default AddProductModal;
+}

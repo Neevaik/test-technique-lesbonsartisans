@@ -49,7 +49,7 @@ export default function LoginPage() {
         const data = await response.json();
         dispatch(login({
           username: data.user.username,
-          token: data.user.token,
+          token: data.token,
         }));
 
         router.push('/home');

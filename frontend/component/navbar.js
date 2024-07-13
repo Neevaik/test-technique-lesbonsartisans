@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Typography } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { logout } from '@/reducers/users';
 //#endregion
 
@@ -11,10 +11,6 @@ export default function Navbar() {
   
   const dispatch = useDispatch();
   const drawerWidth = 240;
-  const user = useSelector((state) => state.users.value)
-
-  console.log({user})
-
 
   return (
     <Drawer
