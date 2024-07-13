@@ -1,4 +1,5 @@
-const { checkBody,checkWhiteSpaces } = require('./tools/bodyExamination');
+
+const { checkBody,checkWhiteSpaces } = require('./tools/inspectBody');
 const User = require('../models/users');
 
 async function checkUser(username) {

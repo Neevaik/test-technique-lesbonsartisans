@@ -8,7 +8,7 @@ const User = require('../models/users');
 const bcrypt = require('bcrypt');
 
 const { validateSignup } = require('../modules/checkUser');
-const { checkBody } = require('../modules/tools/bodyExamination');
+const { checkBody } = require('../modules/tools/inspectBody');
 const { generateToken } = require('../modules/tools/generateToken');
 //#endregion
 
@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
   if (!validUser.isValid) {
     return res.status(400).json({ result: false, message: validUser.message });
   }
-  
+
   const { username } = validUser;
   try {
 
@@ -31,11 +31,11 @@ router.post('/signup', async (req, res) => {
     const data = await newUser.save();
 
     const token = generateToken({
-      username:data.username,
-      createdAt:new Date()
+      username: data.username,
+      createdAt: new Date()
     })
 
-    return res.json({ result: true, message: 'User added!', user: data,token });
+    return res.json({ result: true, message: 'User added!', user: data, token });
 
   } catch (error) {
     return res.status(500).json({ result: false, message: 'Internal server error', error: error.message });
@@ -52,14 +52,13 @@ router.post('/signin', async (req, res) => {
   }
   try {
     const user = await User.findOne({ username });
-
+    
     if (user && bcrypt.compareSync(password, user.password)) {
       const token = generateToken({
-        username:user.username,
-        createdAt:new Date(),
+        username: user.username,
+        createdAt: new Date(),
       })
-
-      return res.json({ result: true, user,token });
+      return res.json({ result: true, user, token });
     }
     return res.status(401).json({ result: false, message: 'Invalid username or password' });
 

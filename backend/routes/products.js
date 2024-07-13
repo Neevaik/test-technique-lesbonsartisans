@@ -1,11 +1,13 @@
-//#region 
+//#region imports
 var express = require('express');
 var router = express.Router();
 const Product = require('../models/products');
+const { verifyToken } = require('../modules/tools/verifyToken')
 //#endregion
 
 //#region POST METHOD
-router.post('/add', (req, res) => {
+router.post('/add', verifyToken, (req, res) => {
+
     const newProduct = new Product({
         name: req.body.name,
         type: req.body.type,
@@ -27,7 +29,7 @@ router.post('/add', (req, res) => {
 //#endregion
 
 //#region GET METHOD
-router.get('/getAll', (req, res) => {
+router.get('/all', (req, res) => {
     Product.find()
         .then(data => {
             res.json({ result: true, allProducts: data })
@@ -44,7 +46,7 @@ router.get('/getOne/:id', (req, res) => {
 //#endregion
 
 //#region PUT METHOD
-router.put('/update/:id', (req, res) => {
+router.put('/update/:id',verifyToken, (req, res) => {
     const productId = req.params.id;
 
     const updatedProduct = {
@@ -73,19 +75,18 @@ router.put('/update/:id', (req, res) => {
 //#endregion
 
 //#region DELETE METHOD
-router.delete('/delete/:id',(req,res) => {
+router.delete('/delete/:id',verifyToken, (req, res) => {
     const productId = req.params.id;
 
-    Product.deleteOne({_id : productId})
-    .then(() => {
-        return Product.find()
-    })
-    .then(() => {
-        res.json({result:true, message: 'Product deleted!'})
-    })
+    Product.deleteOne({ _id: productId })
+        .then(() => {
+            return Product.find()
+        })
+        .then(() => {
+            res.json({ result: true, message: 'Product deleted!' })
+        })
 })
 //#endregion
-
 
 
 module.exports = router;
